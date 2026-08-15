@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b63ce">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>機器配置管理 Prototype</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;background:#f5f7fb;color:#172033}
+button{font:inherit;border:0} .app{max-width:520px;margin:auto;min-height:100vh;background:#f5f7fb}
+header{position:sticky;top:0;z-index:5;background:#fff;padding:14px 16px 10px;border-bottom:1px solid #e5e9f0}
+h1{font-size:20px;margin:0 0 4px}.sub{font-size:12px;color:#7a8494}
+main{padding:14px 14px 90px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:#fff;border:1px solid #e1e6ef;border-radius:14px;padding:13px;box-shadow:0 2px 8px #00000008}
+.kpi{display:flex;justify-content:space-between;align-items:center}.kpi strong{font-size:28px}.icon{font-size:27px}
+.blue{color:#0864d8}.green{color:#168a5a}.muted{color:#8b94a3}.title{font-weight:700;margin:17px 0 9px}
+.wardgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.ward{background:#fff;border:1px solid #cfe0f7;border-radius:11px;padding:10px 4px;text-align:center;font-weight:700;color:#1263bd;cursor:pointer}
+.ward small{display:block;color:#8a94a5;font-size:10px;font-weight:500;margin-top:3px}
+.section{background:#fff;border-radius:14px;border:1px solid #e1e6ef;margin-bottom:10px;overflow:hidden}
+.section h3{font-size:14px;margin:0;padding:11px 13px;background:#fafbfd}
+.row{padding:11px 13px;border-top:1px solid #edf0f4;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.row small{display:block;color:#7e8795;font-size:11px;margin-top:3px}.pill{font-size:11px;padding:4px 8px;border-radius:99px;background:#eaf2ff;color:#1464c3;white-space:nowrap}
+.pill.use{background:#e7f7ef;color:#168a5a}.pill.check{background:#fff3d8;color:#b87900}.pill.bad{background:#ffe5e7;color:#c52d3a}
+.tabs{display:flex;background:#fff;border-radius:12px;padding:4px;margin-bottom:10px;border:1px solid #e1e6ef}.tabs button{flex:1;padding:9px;background:transparent;border-radius:9px;color:#6c7584}.tabs .on{background:#eaf2ff;color:#0864d8;font-weight:700}
+.map{display:grid;gap:10px}.mapward{background:#fff;border:1px solid #e1e6ef;border-radius:14px;padding:10px}.maphead{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px}.beds{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.bed{min-height:48px;border:1px solid #e7ebf1;border-radius:8px;padding:5px;font-size:10px;background:#fafbfc}.bed.hasV{border:2px solid #2b73d2}.bed.hasP{border:2px solid #19a06b}.bed b{display:block;font-size:10px}.bed span{display:block;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roomchips{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:10px}.room{padding:8px 2px;border:1px solid #dfe5ee;background:#fff;border-radius:8px;text-align:center;font-size:12px}.room.on{background:#1263bd;color:#fff}
+.bottom{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:auto;background:#fff;border-top:1px solid #e1e6ef;display:flex;padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:8}.bottom button{flex:1;background:none;color:#687385;font-size:11px}.bottom button.on{color:#0864d8;font-weight:700}.bottom i{display:block;font-size:19px;font-style:normal;margin-bottom:2px}
+.primary{width:100%;padding:13px;border-radius:11px;background:#0864d8;color:white;font-weight:700;margin-top:10px}.back{background:none;color:#0864d8;padding:0;margin-bottom:10px}
+select{width:100%;padding:12px;border:1px solid #dfe5ee;border-radius:10px;background:#fff;margin:6px 0 10px}
+.note{font-size:11px;color:#6e7888;line-height:1.6;background:#eef5ff;padding:10px;border-radius:10px}
+.hidden{display:none}
+@media(min-width:700px){body{padding:20px}.app{border-radius:20px;overflow:hidden;box-shadow:0 10px 40px #0002}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>機器配置管理</h1><div class="sub">試作品｜最終更新：たった今</div></header>
+<main id="main"></main>
+<nav class="bottom">
+<button class="on" data-nav="home"><i>⌂</i>ホーム</button>
+<button data-nav="map"><i>▦</i>機器マップ</button>
+<button data-nav="list"><i>☷</i>機器一覧</button>
+<button data-nav="ce"><i>▣</i>CE室</button>
+</nav>
+</div>
+<script>
+const wards=["5A","6A","7A","8A","5B","6B","7B","ICU"];
+const devices=[
+{id:"V01",name:"人工呼吸器①",type:"V",status:"使用中",loc:["5A",3,1]},
+{id:"V02",name:"人工呼吸器②",type:"V",status:"待機",loc:["CE室"]},
+{id:"V03",name:"人工呼吸器③",type:"V",status:"点検中",loc:["HCU",2]},
+{id:"V04",name:"人工呼吸器④",type:"V",status:"待機",loc:["6A",8,2]},
+{id:"V05",name:"人工呼吸器⑤",type:"V",status:"使用中",loc:["ICU",7,1]},
+{id:"V06",name:"人工呼吸器⑥",type:"V",status:"待機",loc:["CE室"]},
+{id:"P01",name:"PM①",type:"P",status:"待機",loc:["CE室"]},
+{id:"P02",name:"PM②",type:"P",status:"使用中",loc:["5A",3,2]},
+{id:"P03",name:"PM③",type:"P",status:"使用中",loc:["HCU",2]},
+{id:"P04",name:"PM④",type:"P",status:"待機",loc:["7B",5,1]}
+];
+let screen="home", selectedWard="5A", selectedRoom=3, filter="all", moveId=null;
+
+function statusClass(s){return s==="使用中"?"use":s==="点検中"?"check":s==="故障・使用禁止"?"bad":""}
+function deviceLabel(d){return (d.type==="V"?"🫁 ":"💚 ")+d.name}
+function locText(d){if(d.loc[0]==="CE室")return "CE室"; if(d.loc[0]==="HCU")return "HCU "+d.loc[1]+"床"; if(d.loc[0]==="OPE")return "OPE "+d.loc[1]; return `${d.loc[0]} ${d.loc[1]}号室 ベッド${d.loc[2]}`}
+function render(){
+ const m=document.getElementById("main");
+ if(screen==="home") m.innerHTML=home();
+ if(screen==="map") m.innerHTML=map();
+ if(screen==="list") m.innerHTML=list();
+ if(screen==="ce") m.innerHTML=ce();
+ bind();
+}
+function home(){
+ let v=devices.filter(d=>d.type==="V"),p=devices.filter(d=>d.type==="P");
+ return `<div class="grid">
+ <div class="card"><div class="kpi"><div><div class="muted">人工呼吸器</div><strong class="blue">${v.length}</strong> 台</div><div class="icon">🫁</div></div><small>使用中 ${v.filter(x=>x.status==="使用中").length} ・ 待機 ${v.filter(x=>x.status==="待機").length}</small></div>
+ <div class="card"><div class="kpi"><div><div class="muted">対外式ペースメーカー</div><strong class="green">${p.length}</strong> 台</div><div class="icon">💚</div></div><small>使用中 ${p.filter(x=>x.status==="使用中").length} ・ 待機 ${p.filter(x=>x.status==="待機").length}</small></div>
+ </div>
+ <div class="title">病棟・部門一覧</div><div class="wardgrid">${wards.map(w=>`<div class="ward" data-ward="${w}">${w}<small>1〜14号室<br>ベッド1〜4</small></div>`).join("")}</div>
+ <div class="title">その他</div><div class="grid">
+ <div class="ward" data-special="HCU">HCU<small>1〜4</small></div>
+ <div class="ward" data-special="OPE">OPE室<small>1・2・3・5・HOR</small></div>
+ </div>
+ <div class="card" style="margin-top:10px"><b>🔎 「どこにある？」を一目で確認</b><p class="note">機器マップでは、人工呼吸器・対外式ペースメーカーが置かれているベッドだけを表示します。空きベッドは表示しません。</p></div>`;
+}
+function map(){
+ let types=[["V","人工呼吸器"],["P","対外式ペースメーカー"],["all","すべて"]]; 
+ return `<div class="tabs">${types.map(x=>`<button class="${filter===x[0]?"on":""}" data-filter="${x[0]}">${x[1]}</button>`).join("")}</div>
+ <div class="map">${wards.map(w=>mapWard(w)).join("")}${specialMap("HCU",["1","2","3","4"])}${specialMap("OPE",["1","2","3","5","HOR"])}<div class="mapward"><div class="maphead"><span>CE室</span><span class="muted">${devices.filter(d=>d.loc[0]==="CE室").length}台</span></div><div class="note">未使用機器を集積</div></div></div>`;
+}
+function mapWard(w){
+ let ds=devices.filter(d=>d.loc[0]===w && (filter==="all"||d.type===filter));
+ if(!ds.length)return "";
+ let cells=[...new Set(ds.map(d=>`${d.loc[1]}-${d.loc[2]}`))];
+ return `<div class="mapward"><div class="maphead"><span>${w}病棟</span><span class="muted">${ds.length}台</span></div><div class="beds">${cells.map(k=>{let [r,b]=k.split("-");let arr=ds.filter(d=>d.loc[1]==r&&d.loc[2]==b);return `<div class="bed ${arr.some(d=>d.type==="V")?"hasV":""} ${arr.some(d=>d.type==="P")?"hasP":""}"><b>${r}号室・ベッド${b}</b>${arr.map(d=>`<span>${deviceLabel(d)}</span>`).join("")}</div>`}).join("")}</div></div>`;
+}
+function specialMap(name, slots){
+ let ds=devices.filter(d=>d.loc[0]===name && (filter==="all"||d.type===filter)); if(!ds.length)return "";
+ return `<div class="mapward"><div class="maphead"><span>${name}</span><span class="muted">${ds.length}台</span></div><div class="beds">${slots.map(s=>{let arr=ds.filter(d=>String(d.loc[1])===s);return `<div class="bed ${arr.some(d=>d.type==="V")?"hasV":""} ${arr.some(d=>d.type==="P")?"hasP":""}"><b>${s}</b>${arr.map(d=>`<span>${deviceLabel(d)}</span>`).join("")}</div>`}).join("")}</div></div>`;
+}
+function list(){
+ let ds=devices.filter(d=>filter==="all"||d.type===filter);
+ return `<div class="tabs"><button class="${filter==="all"?"on":""}" data-filter="all">すべて</button><button class="${filter==="V"?"on":""}" data-filter="V">人工呼吸器</button><button class="${filter==="P"?"on":""}" data-filter="P">ペースメーカー</button></div>
+ <div class="section">${ds.map(d=>`<div class="row" data-move="${d.id}"><div><b>${deviceLabel(d)}</b><small>${locText(d)}</small></div><span class="pill ${statusClass(d.status)}">${d.status}</span></div>`).join("")}</div>
+ <div class="note">機器をタップすると移動画面へ進みます。</div>`;
+}
+function ce(){
+ let ds=devices.filter(d=>d.loc[0]==="CE室");
+ return `<button class="back" data-nav="home">‹ ホーム</button><div class="title">CE室（未使用機器）</div><div class="section">${ds.map(d=>`<div class="row" data-move="${d.id}"><div><b>${deviceLabel(d)}</b><small>管理番号 ${d.id}</small></div><span class="pill ${statusClass(d.status)}">${d.status}</span></div>`).join("")}</div><button class="primary" data-nav="list">機器一覧を見る</button>`;
+}
+function wardScreen(w){
+ screen="ward"; selectedWard=w; renderWard();
+}
+function renderWard(){
+ const m=document.getElementById("main");
+ let usedRooms=[...new Set(devices.filter(d=>d.loc[0]===selectedWard).map(d=>d.loc[1]))].sort((a,b)=>a-b);
+ m.innerHTML=`<button class="back" data-nav="home">‹ ホーム</button><h2>${selectedWard}病棟</h2><div class="roomchips">${Array.from({length:14},(_,i)=>i+1).map(r=>`<button class="room ${selectedRoom===r?"on":""}" data-room="${r}">${r}</button>`).join("")}</div><div class="section"><h3>${selectedRoom}号室</h3>${[1,2,3,4].map(b=>{let arr=devices.filter(d=>d.loc[0]===selectedWard&&d.loc[1]===selectedRoom&&d.loc[2]===b);return arr.length?arr.map(d=>`<div class="row" data-move="${d.id}"><div><b>ベッド${b}　${deviceLabel(d)}</b><small>${d.status}</small></div><span class="pill ${statusClass(d.status)}">›</span></div>`).join(""):""}).join("")}</div><div class="note">この病棟では、機器が配置されているベッドだけ表示します。</div>`;
+ bind();
+}
+function moveScreen(id){
+ moveId=id; screen="move";
+ const d=devices.find(x=>x.id===id), m=document.getElementById("main");
+ m.innerHTML=`<button class="back" data-nav="list">‹ 戻る</button><h2>機器を移動</h2><div class="card"><b>${deviceLabel(d)}</b><p class="sub">現在地：${locText(d)}<br>状態：${d.status}</p></div><div class="title">移動先</div><select id="dest"><option value="">選択してください</option>${wards.map(w=>`<option value="${w}">${w}病棟</option>`).join("")}<option value="HCU">HCU</option><option value="OPE">OPE室</option><option value="CE室">CE室</option></select><div id="extra"></div><button class="primary" id="confirm">この場所に移動する</button>`;
+ document.getElementById("dest").onchange=e=>extra(e.target.value);
+ document.getElementById("confirm").onclick=confirmMove;
+}
+function extra(v){
+ let e=document.getElementById("extra"); if(!v){e.innerHTML="";return}
+ if(wards.includes(v))e.innerHTML=`<select id="room"><option value="">号室</option>${Array.from({length:14},(_,i)=>`<option value="${i+1}">${i+1}号室</option>`).join("")}</select><select id="bed"><option value="">ベッド</option>${[1,2,3,4].map(x=>`<option>${x}</option>`).join("")}</select>`;
+ else if(v==="HCU")e.innerHTML=`<select id="slot"><option value="">場所</option>${[1,2,3,4].map(x=>`<option>${x}</option>`).join("")}</select>`;
+ else if(v==="OPE")e.innerHTML=`<select id="slot"><option value="">場所</option>${["1","2","3","5","HOR"].map(x=>`<option>${x}</option>`).join("")}</select>`;
+ else e.innerHTML=`<div class="note">CE室に戻すと「未使用機器」として集積管理します。</div>`;
+}
+function confirmMove(){
+ let d=devices.find(x=>x.id===moveId), dest=document.getElementById("dest").value;
+ if(!dest)return alert("移動先を選択してください");
+ if(wards.includes(dest)){let r=document.getElementById("room")?.value,b=document.getElementById("bed")?.value;if(!r||!b)return alert("号室とベッドを選択してください");d.loc=[dest,+r,+b]}
+ else if(dest==="HCU"||dest==="OPE"){let s=document.getElementById("slot")?.value;if(!s)return alert("場所を選択してください");d.loc=[dest,s]}
+ else d.loc=["CE室"];
+ screen="map";render();
+}
+function bind(){
+ document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{screen=b.dataset.nav;render()});
+ document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.filter;render()});
+ document.querySelectorAll("[data-ward]").forEach(b=>b.onclick=()=>wardScreen(b.dataset.ward));
+ document.querySelectorAll("[data-special]").forEach(b=>b.onclick=()=>{screen="map";render()});
+ document.querySelectorAll("[data-move]").forEach(b=>b.onclick=()=>moveScreen(b.dataset.move));
+ document.querySelectorAll("[data-room]").forEach(b=>b.onclick=()=>{selectedRoom=+b.dataset.room;renderWard()});
+}
+render();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
