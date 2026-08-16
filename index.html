@@ -86,7 +86,7 @@ function home(){
  <div class="card" style="margin-top:10px"><b>🔎 「どこにある？」を一目で確認</b><p class="note">機器マップでは、人工呼吸器・体外式ペースメーカーが置かれているベッドだけを表示します。空きベッドは表示しません。</p></div>`;
 }
 function map(){
- let types=[["V","人工呼吸器"],["P","対外式ペースメーカー"],["all","すべて"]]; 
+ let types=[["V","人工呼吸器"],["P",体外式ペースメーカー"],["all","すべて"]]; 
  return `<div class="tabs">${types.map(x=>`<button class="${filter===x[0]?"on":""}" data-filter="${x[0]}">${x[1]}</button>`).join("")}</div>
  <div class="map">${wards.map(w=>mapWard(w)).join("")}${specialMap("HCU",["1","2","3","4"])}${specialMap("OPE",["1","2","3","5","HOR"])}<div class="mapward"><div class="maphead"><span>CE室</span><span class="muted">${devices.filter(d=>d.loc[0]==="CE室").length}台</span></div><div class="note">未使用機器を集積</div></div></div>`;
 }
