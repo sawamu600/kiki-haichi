@@ -1,0 +1,9 @@
+{
+  "name": "機器配置管理",
+  "short_name": "機器配置管理",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#0b63ce",
+  "lang": "ja"
+}
