@@ -46,7 +46,7 @@ select{width:100%;padding:12px;border:1px solid #dfe5ee;border-radius:10px;backg
 </nav>
 </div>
 <script>
-const wards=["5A","6A","7A","8A","5B","6B","7B","ICU"];
+const wards=["5A","6A","7A","8A","5B","6B","7B","ICU"];ほ
 const devices=[
 {id:"V01",name:"人工呼吸器①",type:"V",status:"使用中",loc:["5A",3,1]},
 {id:"V02",name:"人工呼吸器②",type:"V",status:"待機",loc:["CE室"]},
@@ -76,14 +76,14 @@ function home(){
  let v=devices.filter(d=>d.type==="V"),p=devices.filter(d=>d.type==="P");
  return `<div class="grid">
  <div class="card"><div class="kpi"><div><div class="muted">人工呼吸器</div><strong class="blue">${v.length}</strong> 台</div><div class="icon">🫁</div></div><small>使用中 ${v.filter(x=>x.status==="使用中").length} ・ 待機 ${v.filter(x=>x.status==="待機").length}</small></div>
- <div class="card"><div class="kpi"><div><div class="muted">対外式ペースメーカー</div><strong class="green">${p.length}</strong> 台</div><div class="icon">💚</div></div><small>使用中 ${p.filter(x=>x.status==="使用中").length} ・ 待機 ${p.filter(x=>x.status==="待機").length}</small></div>
+ <div class="card"><div class="kpi"><div><div class="muted">体外式ペースメーカー</div><strong class="green">${p.length}</strong> 台</div><div class="icon">💚</div></div><small>使用中 ${p.filter(x=>x.status==="使用中").length} ・ 待機 ${p.filter(x=>x.status==="待機").length}</small></div>
  </div>
  <div class="title">病棟・部門一覧</div><div class="wardgrid">${wards.map(w=>`<div class="ward" data-ward="${w}">${w}<small>1〜14号室<br>ベッド1〜4</small></div>`).join("")}</div>
  <div class="title">その他</div><div class="grid">
  <div class="ward" data-special="HCU">HCU<small>1〜4</small></div>
  <div class="ward" data-special="OPE">OPE室<small>1・2・3・5・HOR</small></div>
  </div>
- <div class="card" style="margin-top:10px"><b>🔎 「どこにある？」を一目で確認</b><p class="note">機器マップでは、人工呼吸器・対外式ペースメーカーが置かれているベッドだけを表示します。空きベッドは表示しません。</p></div>`;
+ <div class="card" style="margin-top:10px"><b>🔎 「どこにある？」を一目で確認</b><p class="note">機器マップでは、人工呼吸器・体外式ペースメーカーが置かれているベッドだけを表示します。空きベッドは表示しません。</p></div>`;
 }
 function map(){
  let types=[["V","人工呼吸器"],["P","対外式ペースメーカー"],["all","すべて"]]; 
