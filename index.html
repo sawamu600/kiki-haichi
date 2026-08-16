@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b63ce"><link rel="manifest" href="manifest.json?v=9"><link rel="apple-touch-icon" href="icon-180.png?v=9">
+<title>機器配置管理</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;background:#f5f7fb;color:#172033}
+button,input,select{font:inherit}.app{max-width:600px;margin:auto;min-height:100vh}.hide{display:none!important}
+header{background:#fff;padding:14px 16px;border-bottom:1px solid #e5e9f0;position:sticky;top:0;z-index:5}
+h1{font-size:20px;margin:0}.sub{font-size:12px;color:#7a8494}main{padding:14px 14px 96px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card,.section,.mapward{background:#fff;border:1px solid #e1e6ef;border-radius:14px;padding:13px}
+.kpi{display:flex;justify-content:space-between}.kpi strong{font-size:25px}.blue{color:#0864d8}.green{color:#168a5a}.purple{color:#7451b9}.orange{color:#c66b00}.red{color:#c93648}.muted{color:#8b94a3}.title{font-weight:700;margin:17px 0 9px}
+.wardgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.ward{background:#fff;border:1px solid #cfe0f7;border-radius:11px;padding:10px 4px;text-align:center;font-weight:700;color:#1263bd}
+.ward small{display:block;color:#8a94a5;font-size:10px;font-weight:500}.section{padding:0;overflow:hidden;margin-bottom:10px}.row{padding:11px 13px;border-top:1px solid #edf0f4;display:flex;justify-content:space-between;align-items:center}.row:first-child{border-top:0}
+.row small{display:block;color:#7e8795;font-size:11px}.pill{font-size:11px;padding:4px 8px;border-radius:99px;background:#eaf2ff;color:#1464c3}.use{background:#e7f7ef;color:#168a5a}.check{background:#fff3d8;color:#b87900}.bad{background:#ffe5e7;color:#c52d3a}
+.tabs{display:flex;overflow:auto;background:#fff;border-radius:12px;padding:4px;margin-bottom:10px;border:1px solid #e1e6ef;gap:3px}.tabs button{flex:0 0 auto;padding:9px 10px;border:0;background:transparent;border-radius:9px;white-space:nowrap}.tabs .on{background:#eaf2ff;color:#0864d8;font-weight:700}
+.map{display:grid;gap:10px}.maphead{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px}.beds{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.bed{border:1px solid #e7ebf1;border-radius:8px;padding:6px;font-size:10px;background:#fafbfc}.bed b{display:block;margin-bottom:4px}
+.roomchips{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.room{padding:8px 2px;border:1px solid #dfe5ee;background:#fff;border-radius:8px}.room.on{background:#1263bd;color:#fff}
+.bottom{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:auto;background:#fff;border-top:1px solid #e1e6ef;display:flex;padding:8px calc(8px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));z-index:8}.bottom button{flex:1;border:0;background:none;color:#687385;font-size:10px}.bottom .on{color:#0864d8;font-weight:700}
+.primary{width:100%;padding:13px;border:0;border-radius:11px;background:#0864d8;color:white;font-weight:700;margin-top:10px}.secondary{width:100%;padding:11px;border:1px solid #ccd6e4;border-radius:11px;background:white;color:#526070;font-weight:600;margin-top:8px}
+.danger{width:100%;padding:11px;border:1px solid #f0b8bd;border-radius:11px;background:#fff;color:#c52d3a;font-weight:600;margin-top:8px}.back{border:0;background:none;color:#0864d8;padding:0}
+input,select{width:100%;padding:12px;border:1px solid #dfe5ee;border-radius:10px;background:#fff;margin:6px 0 10px}.note{font-size:11px;color:#6e7888;background:#eef5ff;padding:10px;border-radius:10px;line-height:1.5}
+.login{padding:30px 16px}.loginbox{background:#fff;border:1px solid #e1e6ef;border-radius:18px;padding:20px}.loginbox h2{text-align:center}.err{color:#c52d3a;font-size:12px;margin-top:8px}
+.fab{position:fixed;right:max(18px,calc((100vw - 600px)/2 + 18px));bottom:86px;border:0;border-radius:999px;background:#0864d8;color:#fff;padding:13px 16px;font-weight:700;box-shadow:0 5px 20px #0003;z-index:7}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.label{font-size:12px;color:#596475;margin-top:8px}.countgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.count{background:#fff;border:1px solid #e1e6ef;border-radius:12px;padding:10px;text-align:center;color:#172033}.homefilter{font:inherit;cursor:pointer}.homefilter:active{background:#eef5ff;transform:scale(.98)}.count strong{display:block;font-size:20px}
+
+.mapdevice{width:100%;text-align:left;border:0;background:#fff;border-radius:8px;padding:7px 8px;margin-top:5px;color:#172033}
+.mapdevice:active{background:#eef5ff}.mapdevice small{display:block;color:#7e8795;font-size:10px;margin-top:2px}
+.mapdevice.full{border:1px solid #edf0f4;margin-top:6px}
+
+
+.deadlinegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.deadline{background:#fff;border:1px solid #dfe5ee;border-radius:10px;padding:9px}
+.deadline b{display:block;font-size:12px;margin-bottom:4px}.deadline small{display:block;color:#7e8795}
+.deadline .remain{font-weight:700;margin-top:4px}.remain.warn{color:#d33}.remain.ok{color:#0864d8}
+.devicecard{display:grid;grid-template-columns:1fr;gap:6px}.devicehead{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.devicehead .meta{font-size:11px;color:#7e8795}.editbtn{border:0;background:#eef5ff;color:#0864d8;border-radius:8px;padding:6px 8px;font-size:11px}
+
+
+/* v17: 機器がある配置場所を薄い緑で強調 */
+.ward.occupied,.location-tile.occupied,.special-tile.occupied{
+  background:#dcf5e2 !important;
+  border-color:#9fd8aa !important;
+  box-shadow:0 0 0 1px rgba(47,125,67,.04) inset !important;
+}
+.ward.occupied small,.location-tile.occupied small,.special-tile.occupied small{
+  color:#2f7d43 !important;
+  font-weight:700;
+}
+
+
+/* v21: ホーム上部5機種の見た目だけ変更（安全版） */
+.top-device-icon{
+  width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 4px;
+  font-size:34px;font-weight:800;line-height:1;
+}
+.top-device-icon.v{color:#1465e8}
+.top-device-icon.p{color:#ef4444}
+.top-device-icon.e{color:#18a7ad}
+.top-device-icon.i{color:#f06416}
+.top-device-icon.m{color:#9b5bd6}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header id="hdr" class="hide"><div style="display:flex;justify-content:space-between;align-items:center"><div><h1>機器配置管理</h1><div id="sync" class="sub">Firebase共有版 v6</div></div><button id="logout">ログアウト</button></div></header>
+<main id="main"></main>
+<button id="fab" class="fab hide">＋ 機器登録</button>
+<nav id="nav" class="bottom hide">
+<button data-nav="home">⌂<br>ホーム</button><button data-nav="map">▦<br>機器マップ</button><button data-nav="list">☷<br>機器一覧</button><button data-nav="ce">▣<br>CE室</button><button data-nav="register">＋<br>機器登録</button>
+</nav>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDocs, onSnapshot, serverTimestamp, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+const firebaseConfig = {"apiKey": "AIzaSyC68wPuJyc5LVawYBQ83yBg97xVTcpbRGw", "authDomain": "kiki-haichi.firebaseapp.com", "projectId": "kiki-haichi", "storageBucket": "kiki-haichi.firebasestorage.app", "messagingSenderId": "38083816609", "appId": "1:38083816609:web:712c500c1cf669349d54e0"};
+const SHARED_EMAIL="ce-shared@example.com";
+const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
+
+const wards=["5A","6A","7A","8A","5B","6B","7B"];
+const roomBasedSpecials=[];
+const simpleSpecials=["AG1","AG2"];
+const ICU_SLOTS=["1","2","3","4","5","6","7","8","駐機"];
+const TYPES={
+  V:{label:"人工呼吸器",icon:"🫁"},
+  P:{label:"体外式ペースメーカー",icon:"💚"},
+  E:{label:"ECMO",icon:"🫀"},
+  I:{label:"IABP",icon:"🎈"},
+  M:{label:"IMPELLA",icon:"⚙️"}
+};
+
+let devices=[],screen="home",filter="all",ward="5A",room=3,moveId=null,unsub=null;
+
+const $=s=>document.querySelector(s);
+function sc(s){return s==="使用中"?"use":s==="点検中"?"check":s==="故障・使用禁止"?"bad":""}
+function dl(d){const t=TYPES[d.type]||{label:d.type,icon:"🔧"};return `${t.icon} ${d.name}`}
+function typeLabel(d){return (TYPES[d.type]||{label:d.type}).label}
+function lt(d){const l=d.loc;if(!l)return"未設定";if(l[0]==="CE室")return"CE室";if(l[0]==="HCU")return"HCU "+l[1];if(l[0]==="OPE")return"OPE "+l[1];if(l[0]==="ICU")return l[1]==="駐機"?"ICU 駐機":`ICU ベッド${l[1]}`;if(l[0]==="AG1"||l[0]==="AG2")return l[0];return `${l[0]} ${l[1]}号室 ベッド${l[2]}`}
+function daysLeft(dateStr){
+  if(!dateStr)return null;
+  const end=new Date(dateStr+"T23:59:59");
+  const now=new Date();
+  return Math.ceil((end-now)/(1000*60*60*24));
+}
+function deadlineCard(label,dateStr,icon="📅"){
+  if(!dateStr)return `<div class="deadline"><b>${icon} ${label}</b><small>未設定</small></div>`;
+  const left=daysLeft(dateStr);
+  const cls=left!==null && left<=3 ? "warn":"ok";
+  const txt=left<0?`期限切れ ${Math.abs(left)}日`:`残り ${left}日`;
+  return `<div class="deadline"><b>${icon} ${label}</b><small>${dateStr.replaceAll("-","/")}</small><div class="remain ${cls}">${txt}</div></div>`;
+}
+function ventilatorDeadlineBlock(d){
+  if(d.type!=="V")return "";
+  return `<div class="deadlinegrid">${deadlineCard("回路期限",d.circuitDeadline,"🌀")}${deadlineCard("人工呼吸器使用期限",d.ventilatorDeadline,"🫁")}</div>`;
+}
+
+function showLogin(msg=""){ $("#hdr").classList.add("hide");$("#nav").classList.add("hide");$("#fab").classList.add("hide");$("#main").innerHTML=`<div class="login"><div class="loginbox"><h2>🏥 機器配置管理</h2><p class="sub" style="text-align:center">CE共通パスワード</p><input id="pw" type="password" placeholder="パスワード"><button id="login" class="primary">ログイン</button><div class="err">${msg}</div></div></div>`;$("#login").onclick=login;$("#pw").onkeydown=e=>{if(e.key==="Enter")login()}}
+async function login(){try{await signInWithEmailAndPassword(auth,SHARED_EMAIL,$("#pw").value)}catch(e){showLogin("ログインできません。パスワードを確認してください。")}}
+function startRT(){if(unsub)unsub();unsub=onSnapshot(collection(db,"devices"),s=>{devices=s.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(a.name||a.id).localeCompare(b.name||b.id,"ja"));$("#sync").textContent="同期済み "+new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});render()})}
+function tabs(){return `<div class="tabs"><button data-filter="all" class="${filter==="all"?"on":""}">すべて</button>${Object.entries(TYPES).map(([k,v])=>`<button data-filter="${k}" class="${filter===k?"on":""}">${v.label}</button>`).join("")}</div>`}
+function home(){
+ const counts=Object.entries(TYPES).map(([k,t])=>({k,t,n:devices.filter(d=>d.type===k).length}));
+ return `<div class="countgrid">${counts.map(x=>["V","P","E","I","M"].includes(x.k)?`<button class="count homefilter" data-home-filter="${x.k}">
+      <div class="top-device-icon ${x.k.toLowerCase()}">${x.k==="V"?"🫁":x.k==="P"?"♥":x.k==="E"?"◉":x.k==="I"?"◒":"⌁"}</div>
+      <strong>${x.n}</strong><small>${x.t.label}</small>
+    </button>`:`<div class="count"><div>${x.t.icon}</div><strong>${x.n}</strong><small>${x.t.label}</small></div>`).join("")}</div>
+ <div class="title">病棟</div><div class="wardgrid">${wards.map(w=>{const n=devices.filter(d=>d.loc?.[0]===w).length;return `<button class="ward ${n>0?"occupied":""}" data-ward="${w}">${w}<small>${n}台</small></button>`}).join("")}</div>
+ <div class="title">その他</div>
+<div class="grid">
+  <button class="ward ${devices.some(d=>d.loc?.[0]==="ICU")?"occupied":""}" data-icu>ICU<small>${devices.filter(d=>d.loc?.[0]==="ICU").length}台</small></button>
+  <button class="ward ${devices.some(d=>d.loc?.[0]==="HCU")?"occupied":""}" data-special>HCU<small>${devices.filter(d=>d.loc?.[0]==="HCU").length}台</small></button>
+  <button class="ward ${devices.some(d=>d.loc?.[0]==="OPE")?"occupied":""}" data-special>OPE室<small>${devices.filter(d=>d.loc?.[0]==="OPE").length}台</small></button>
+  <button class="ward ${devices.some(d=>d.loc?.[0]==="AG1")?"occupied":""}" data-simple="AG1">AG1<small>${devices.filter(d=>d.loc?.[0]==="AG1").length}台</small></button>
+  <button class="ward ${devices.some(d=>d.loc?.[0]==="AG2")?"occupied":""}" data-simple="AG2">AG2<small>${devices.filter(d=>d.loc?.[0]==="AG2").length}台</small></button>
+</div>
+ <div class="note" style="margin-top:10px">🟩 薄い緑色＝現在機器が配置されている場所です。<br>人工呼吸器・体外式ペースメーカー・ECMO・IABP・IMPELLAを同じ画面で管理できます。</div>`;
+}
+function mapWard(w){const ds=devices.filter(d=>d.loc?.[0]===w&&(filter==="all"||d.type===filter));if(!ds.length)return"";const keys=[...new Set(ds.map(d=>`${d.loc[1]}-${d.loc[2]}`))];return `<div class="mapward"><div class="maphead"><b>${w}病棟</b><span>${ds.length}台</span></div><div class="beds">${keys.map(k=>{const[r,b]=k.split("-"),a=ds.filter(d=>String(d.loc[1])===r&&String(d.loc[2])===b);return `<div class="bed"><b>${r}号室・ベッド${b}</b>${a.map(d=>`<button class="mapdevice" data-move="${d.id}"><div class="devicecard"><div class="devicehead"><div>${dl(d)}<small>${d.status}</small></div></div>${ventilatorDeadlineBlock(d)}</div></button>`).join("")}</div>`}).join("")}</div></div>`}
+function special(name){const ds=devices.filter(d=>d.loc?.[0]===name&&(filter==="all"||d.type===filter));if(!ds.length)return"";return `<div class="mapward"><div class="maphead"><b>${name}</b><span>${ds.length}台</span></div>${ds.map(d=>`<button class="mapdevice full" data-move="${d.id}"><div class="devicecard"><div class="devicehead"><div>${lt(d)}　${dl(d)}<small>${d.status}</small></div></div>${ventilatorDeadlineBlock(d)}</div></button>`).join("")}</div>`}
+function map(){const ce=devices.filter(d=>d.loc?.[0]==="CE室"&&(filter==="all"||d.type===filter));return tabs()+`<div class="map">${wards.map(mapWard).join("")}${special("ICU")}${special("HCU")}${special("OPE")}${special("AG1")}${special("AG2")}<div class="mapward"><div class="maphead"><b>CE室</b><span>${ce.length}台</span></div>${ce.map(d=>`<button class="mapdevice full" data-move="${d.id}"><div class="devicecard"><div class="devicehead"><div>${dl(d)}<small>${d.status}</small></div></div>${ventilatorDeadlineBlock(d)}</div></button>`).join("")}</div></div>`}
+function list(){const ds=devices.filter(d=>filter==="all"||d.type===filter);return tabs()+`<div class="section">${ds.map(d=>`<div class="row" data-move="${d.id}"><div style="width:100%"><div class="devicehead"><div><b>${dl(d)}</b><small>${typeLabel(d)}｜${d.id}<br>${lt(d)}</small></div><span class="pill ${sc(d.status)}">${d.status}</span></div>${ventilatorDeadlineBlock(d)}</div></div>`).join("")}</div>`}
+function ce(){const ds=devices.filter(d=>d.loc?.[0]==="CE室");return `<div class="title">CE室（未使用機器）</div>${tabs()}<div class="section">${ds.filter(d=>filter==="all"||d.type===filter).map(d=>`<div class="row" data-move="${d.id}"><div><b>${dl(d)}</b><small>${d.id}</small></div><span class="pill ${sc(d.status)}">${d.status}</span></div>`).join("")}</div>`}
+function wardView(){
+  const occupiedRooms=[...new Set(
+    devices
+      .filter(d=>d.loc?.[0]===ward && Number.isFinite(Number(d.loc?.[1])))
+      .map(d=>Number(d.loc[1]))
+  )].sort((a,b)=>a-b);
+
+  if(!occupiedRooms.length){
+    return `<button class="back" data-nav="home">‹ ホーム</button>
+      <h2>${ward}病棟</h2>
+      <div class="note">現在、この病棟に配置されている機器はありません。</div>`;
+  }
+
+  if(!occupiedRooms.includes(room)) room=occupiedRooms[0];
+
+  return `<button class="back" data-nav="home">‹ ホーム</button>
+    <h2>${ward}病棟</h2>
+    <div class="roomchips">
+      ${occupiedRooms.map(r=>`<button class="room ${room===r?"on":""}" data-room="${r}">${r}号室</button>`).join("")}
+    </div>
+    <div class="section">
+      ${[1,2,3,4].flatMap(b=>
+        devices
+          .filter(d=>d.loc?.[0]===ward && Number(d.loc[1])===room && Number(d.loc[2])===b)
+          .map(d=>`<div class="row" data-move="${d.id}">
+            <div style="width:100%">
+              <div class="devicehead">
+                <div><b>ベッド${b}　${dl(d)}</b><small>${typeLabel(d)}</small></div>
+                <span class="pill ${sc(d.status)}">${d.status}</span>
+              </div>
+              ${ventilatorDeadlineBlock(d)}
+            </div>
+          </div>`)
+      ).join("")}
+    </div>
+    <div class="note">機器が配置されている部屋だけ表示しています。</div>`;
+}
+function move(){const d=devices.find(x=>x.id===moveId);return `<button class="back" data-nav="list">‹ 戻る</button><h2>機器詳細・移動</h2><div class="card"><b>${dl(d)}</b><div class="sub">${typeLabel(d)}｜管理番号 ${d.id}</div><div class="sub">${lt(d)}｜${d.status}</div>${d.type==="V"?`<div class="deadlinegrid">${deadlineCard("回路期限",d.circuitDeadline,"🌀")}${deadlineCard("人工呼吸器使用期限",d.ventilatorDeadline,"🫁")}</div><div class="label">回路期限</div><input id="circuitDeadline" type="date" value="${d.circuitDeadline||""}"><div class="label">人工呼吸器使用期限</div><input id="ventilatorDeadline" type="date" value="${d.ventilatorDeadline||""}"><button id="saveDeadlines" class="secondary">期限を保存</button>`:""}</div><select id="dest"><option value="">移動先</option>${wards.map(w=>`<option value="${w}">${w}病棟</option>`).join("")}<option value="ICU">ICU</option><option value="HCU">HCU</option><option value="OPE">OPE室</option><option value="AG1">AG1</option><option value="AG2">AG2</option><option value="CE室">CE室</option></select><div id="extra"></div><button id="save" class="primary">この場所に移動</button><button id="delete" class="danger">この機器を削除</button>`}
+function register(){
+ return `<button class="back" data-nav="list">‹ 機器一覧</button><h2>機器を登録</h2>
+ <div class="label">機器種別</div><select id="rtype">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("")}</select>
+ <div class="label">表示名</div><input id="rname" placeholder="例：ECMO① / IABP②">
+ <div class="label">管理番号</div><input id="rid" placeholder="例：ECMO-001">
+ <div class="label">初期状態</div><div class="note">CE室に登録されるため、自動的に「待機」になります。</div><div class="label">回路期限（人工呼吸器のみ）</div><input id="rcircuit" type="date"><div class="label">人工呼吸器使用期限（人工呼吸器のみ）</div><input id="rvent" type="date">
+ <div class="note">新規登録時はCE室に配置します。登録後に機器一覧から病棟へ移動できます。</div>
+ <button id="regsave" class="primary">機器を登録する</button><div id="regmsg"></div>`;
+}
+function extra(v){if(wards.includes(v))$("#extra").innerHTML=`<select id="r">${Array.from({length:14},(_,i)=>`<option value="${i+1}">${i+1}号室</option>`).join("")}</select><select id="b">${[1,2,3,4].map(x=>`<option>${x}</option>`).join("")}</select>`;else if(v==="ICU")$("#extra").innerHTML=`<select id="s">${ICU_SLOTS.map(x=>`<option value="${x}">${x==="駐機"?"ICU駐機":"ベッド"+x}</option>`).join("")}</select>`;else if(v==="HCU")$("#extra").innerHTML=`<select id="s">${[1,2,3,4].map(x=>`<option>${x}</option>`).join("")}</select>`;else if(v==="OPE")$("#extra").innerHTML=`<select id="s">${["1","2","3","5","HOR"].map(x=>`<option>${x}</option>`).join("")}</select>`;else $("#extra").innerHTML=""}
+async function saveMove(){const d=devices.find(x=>x.id===moveId),dest=$("#dest").value;if(!dest)return;let loc,status=d.status;if(wards.includes(dest))loc=[dest,+$("#r").value,+$("#b").value];else if(dest==="ICU"||dest==="HCU"||dest==="OPE")loc=[dest,$("#s").value];else if(dest==="AG1"||dest==="AG2")loc=[dest];else loc=["CE室"];status=(dest==="CE室"||(dest==="ICU"&&loc[1]==="駐機"))?"待機":"使用中";const from=lt(d);await setDoc(doc(db,"devices",d.id),{loc,status,updatedAt:serverTimestamp()},{merge:true});await addDoc(collection(db,"movementLogs"),{deviceId:d.id,deviceName:d.name,from,to:loc[0]==="CE室"?"CE室":loc.join(" / "),actor:"CE共通",createdAt:serverTimestamp()});screen="map"}
+async function registerDevice(){
+ const type=$("#rtype").value,name=$("#rname").value.trim(),id=$("#rid").value.trim(),status="待機",msg=$("#regmsg"),circuitDeadline=type==="V"?($("#rcircuit").value||null):null,ventilatorDeadline=type==="V"?($("#rvent").value||null):null;
+ if(!name||!id){msg.className="err";msg.textContent="表示名と管理番号を入力してください。";return}
+ if(devices.some(d=>d.id===id)){msg.className="err";msg.textContent="同じ管理番号がすでに登録されています。";return}
+ try{
+   await setDoc(doc(db,"devices",id),{name,type,status,loc:["CE室"],circuitDeadline,ventilatorDeadline,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+   await addDoc(collection(db,"movementLogs"),{deviceId:id,deviceName:name,from:"新規登録",to:"CE室",actor:"CE共通",createdAt:serverTimestamp()});
+   screen="list";filter=type;render();
+ }catch(e){msg.className="err";msg.textContent="登録できませんでした。"}
+}
+
+async function saveDeadlines(){
+ const d=devices.find(x=>x.id===moveId);
+ if(!d||d.type!=="V")return;
+ const circuitDeadline=$("#circuitDeadline").value||null;
+ const ventilatorDeadline=$("#ventilatorDeadline").value||null;
+ await setDoc(doc(db,"devices",d.id),{circuitDeadline,ventilatorDeadline,updatedAt:serverTimestamp()},{merge:true});
+ await addDoc(collection(db,"movementLogs"),{deviceId:d.id,deviceName:d.name,from:"期限更新",to:`回路:${circuitDeadline||"未設定"} / 人工呼吸器:${ventilatorDeadline||"未設定"}`,actor:"CE共通",createdAt:serverTimestamp()});
+ alert("期限を保存しました");
+}
+async function deleteDevice(){
+ const d=devices.find(x=>x.id===moveId);
+ if(!confirm(`${d.name} を削除しますか？`))return;
+ await deleteDoc(doc(db,"devices",d.id));
+ await addDoc(collection(db,"movementLogs"),{deviceId:d.id,deviceName:d.name,from:lt(d),to:"削除",actor:"CE共通",createdAt:serverTimestamp()});
+ screen="list";render();
+}
+function render(){const m=$("#main");m.innerHTML=screen==="home"?home():screen==="map"?map():screen==="list"?list():screen==="ce"?ce():screen==="ward"?wardView():screen==="register"?register():move();bind();document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.nav===screen));$("#fab").classList.toggle("hide",screen==="register")}
+function bind(){
+ document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{screen=b.dataset.nav;render()});
+ document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.filter;render()});document.querySelectorAll("[data-home-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.homeFilter;screen="map";render()});
+ document.querySelectorAll("[data-ward]").forEach(b=>b.onclick=()=>{
+  ward=b.dataset.ward;
+  const occupied=[...new Set(
+    devices.filter(d=>d.loc?.[0]===ward && Number.isFinite(Number(d.loc?.[1]))).map(d=>Number(d.loc[1]))
+  )].sort((a,b)=>a-b);
+  room=occupied.length?occupied[0]:1;
+  screen="ward";
+  render();
+});
+ document.querySelectorAll("[data-special]").forEach(b=>b.onclick=()=>{screen="map";render()});document.querySelectorAll("[data-icu]").forEach(b=>b.onclick=()=>{filter="all";screen="map";render()});document.querySelectorAll("[data-simple]").forEach(b=>b.onclick=()=>{filter="all";screen="map";render()});
+ document.querySelectorAll("[data-move]").forEach(b=>b.onclick=()=>{moveId=b.dataset.move;screen="move";render()});
+ document.querySelectorAll("[data-room]").forEach(b=>b.onclick=()=>{room=+b.dataset.room;render()});
+ if($("#dest"))$("#dest").onchange=e=>extra(e.target.value);
+ if($("#save"))$("#save").onclick=saveMove;
+ if($("#delete"))$("#delete").onclick=deleteDevice;if($("#saveDeadlines"))$("#saveDeadlines").onclick=saveDeadlines;
+ if($("#regsave"))$("#regsave").onclick=registerDevice;
+}
+$("#fab").onclick=()=>{screen="register";render()};
+$("#logout").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,user=>{if(!user){if(unsub)unsub();showLogin();return}$("#hdr").classList.remove("hide");$("#nav").classList.remove("hide");$("#fab").classList.remove("hide");$("#main").innerHTML='<div class="note">機器データを読み込み中…</div>';startRT()});
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
+</script></body></html>
